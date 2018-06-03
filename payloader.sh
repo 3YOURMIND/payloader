@@ -2,7 +2,7 @@
 # Created by argbash-init v2.6.1
 # ARG_OPTIONAL_SINGLE([header],[h],[a file to use as header],['install.sh.in'])
 # ARG_OPTIONAL_BOOLEAN([binary],[b],[should we append binary payload (and implicit default: off)])
-# ARG_POSITIONAL_SINGLE([payload],[p],[])
+# ARG_POSITIONAL_SINGLE([payload],[ a random file for payload],[])
 # ARG_DEFAULTS_POS()
 # ARGBASH_SET_INDENT([  ])
 # ARGBASH_GO()
@@ -40,7 +40,7 @@ _arg_binary="off"
 print_help ()
 {
   printf 'Usage: %s [-h|--header <arg>] [-b|--(no-)binary] <payload>\n' "$0"
-  printf '\t%s\n' "<payload>: p"
+  printf '\t%s\n' "<payload>:  a random file for payload"
   printf '\t%s\n' "-h,--header: a file to use as header (default: ''install.sh.in'')"
   printf '\t%s\n' "-b,--binary,--no-binary: should we append binary payload (and implicit default: off) (off by default)"
 }
@@ -110,15 +110,14 @@ assign_positional_args
 # [ <-- needed because of Argbash
 
 #  <-- needed because of Argbash`
-
 if test "$_arg_binary" = 'on'
 then
   sed \
     -e 's/uuencode=./uuencode=0/' \
     -e 's/binary=./binary=1/' \
-			 $_arg_header >install.sh
-  echo "PAYLOAD:" >> install.sh
-	cat $_arg_payload >> install.sh
+                         $_arg_header > ${_arg_payload}.sh
+  echo "PAYLOAD:" >> ${_arg_payload}.sh
+        cat $_arg_payload >> ${_arg_payload}.sh
 fi
 
 if test $_arg_binary = 'off'
@@ -126,10 +125,9 @@ then
   sed \
     -e 's/uuencode=./uuencode=1/' \
     -e 's/binary=./binary=0/' \
-        $_arg_header >install.sh
-  echo "PAYLOAD:" >> install.sh
-  cat $_arg_payload | uuencode - >> install.sh
+        $_arg_header >${_arg_payload}.sh
+  echo "PAYLOAD:" >> ${_arg_payload}.sh
+  cat $_arg_payload | uuencode - >> ${_arg_payload}.sh
 fi
-
 
 # ] <-- needed because of Argbash
